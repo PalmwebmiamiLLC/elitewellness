@@ -1,0 +1,443 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Elite Wellness Direct - Premium Wellness & Recovery Gear</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom CSS for animations and hover effects */
+        .hover\:grow {
+            transform: scale(1);
+            transition: transform 0.3s ease;
+        }
+        .hover\:grow:hover {
+            transform: scale(1.05);
+        }
+        .transition-colors {
+            transition-property: color, background-color, border-color, fill, stroke;
+            transition-duration: 0.3s;
+            transition-timing-function: ease;
+        }
+        .shadow-custom {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .shadow-hover {
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15), 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Transparent Header */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        /* Hamburger Menu Styles */
+        .menu-toggle {
+            display: none;
+        }
+
+        @media (max-width: 767px) {
+            .menu-toggle {
+                display: block;
+            }
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                position: absolute;
+                top: 64px;
+                left: 0;
+                background: rgba(255, 255, 255, 0.9);
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+            .nav-links.active {
+                display: flex;
+            }
+            .nav-links a {
+                padding: 1rem;
+                text-align: center;
+                border-bottom: 1px solid #e5e7eb;
+            }
+        }
+
+        /* FAQ Section */
+        .faq-item {
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .faq-question {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        .faq-answer {
+            display: none;
+            padding: 1rem 0;
+        }
+        .faq-answer.active {
+            display: block;
+        }
+
+        /* Icon Styling */
+        .product-icon {
+            background-color: #E8F0F5;
+            border-radius: 50%;
+            padding: 10px;
+        }
+
+        /* Refined Button Styling */
+        .refined-button {
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .refined-button-bordered {
+            border-width: 1px;
+        }
+        .refined-button:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-white font-inter" style="background-color: #FFFFFF;">
+    <header class="shadow-md py-4 fixed top-0 w-full z-10">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <div class="logo">
+                <h1 class="text-2xl font-bold" style="color: #2C6EAB;">Elite Wellness Direct</h1>
+            </div>
+            <button class="menu-toggle md:hidden focus:outline-none">
+                <svg class="h-6 w-6" fill="none" stroke="#2C6EAB" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            <nav class="nav-links md:flex md:space-x-6">
+                <a href="#hero" class="hover:text-blue-900 transition-colors" style="color: #2C6EAB;">Home</a>
+                <a href="#about-us" class="hover:text-blue-900 transition-colors" style="color: #2C6EAB;">About</a>
+                <a href="#our-products" class="hover:text-blue-900 transition-colors" style="color: #2C6EAB;">Products</a>
+                <a href="#contact" class="hover:text-blue-900 transition-colors" style="color: #2C6EAB;">Contact</a>
+            </nav>
+            <a href="#shop" class="refined-button text-white" style="background-color: #2C6EAB;">Shop Now</a>
+        </div>
+    </header>
+
+    <section id="hero" class="py-20 pt-32" style="background-color: #E8F0F5;">
+        <div class="container mx-auto text-center px-4">
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold mb-4" style="color: #2C6EAB;">Premium Wellness & Recovery Gear</h1>
+            <p class="text-xl sm:text-2xl mb-8" style="color: #2C6EAB;">Live Elite. Elevate Your Wellness Journey.</p>
+            <p class="text-md sm:text-lg mb-12 max-w-2xl mx-auto" style="color: #2C6EAB;">
+                Elite Wellness Direct specializes in science-backed wellness technology curated for elite lifestyles and long-term performance.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                <a href="#our-products" class="refined-button text-white" style="background-color: #2C6EAB;">Explore Products</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="about-us" class="py-20">
+        <div class="container mx-auto text-center px-4">
+            <h2 class="text-3xl sm:text-4xl font-semibold mb-6" style="color: #2C6EAB;">About Us</h2>
+            <p class="text-md sm:text-lg mb-12 max-w-2xl mx-auto" style="color: #2C6EAB;">
+                Elite Wellness Direct is not a mass retailer. We specialize in premium, science-backed wellness technology curated for elite lifestyles and long-term performance.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+                <div class="bg-white rounded-lg shadow-custom py-8 px-6 transition-shadow hover:shadow-hover hover:grow">
+                    <h3 class="text-xl font-semibold mb-2" style="color: #2C6EAB;">Quality Gear</h3>
+                    <p class="text-md" style="color: #2C6EAB;">Our products are designed with the highest standards for durability and effectiveness.</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-custom py-8 px-6 transition-shadow hover:shadow-hover hover:grow">
+                    <h3 class="text-xl font-semibold mb-2" style="color: #2C6EAB;">Science-Backed</h3>
+                    <p class="text-md" style="color: #2C6EAB;">Every product is rooted in scientific research to support your wellness goals.</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-custom py-8 px-6 transition-shadow hover:shadow-hover hover:grow">
+                    <h3 class="text-xl font-semibold mb-2" style="color: #2C6EAB;">Elite Lifestyle</h3>
+                    <p class="text-md" style="color: #2C6EAB;">Tailored for those who prioritize performance and long-term health.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="our-products" class="py-20" style="background-color: #E8F0F5;">
+        <div class="container mx-auto text-center px-4">
+            <h2 class="text-3xl sm:text-4xl font-semibold mb-6" style="color: #2C6EAB;">Our Products</h2>
+            <p class="text-md sm:text-lg mb-12 max-w-2xl mx-auto" style="color: #2C6EAB;">
+                Discover our premium wellness gear designed for recovery and performance.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+                <div class="bg-white rounded-lg shadow-custom transition-shadow hover:shadow-hover hover:grow">
+                    <div class="flex justify-center py-6">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3048/3048422.png" alt="Cold Plunge Icon" class="h-24 w-24 product-icon" style="filter: invert(27%) sepia(59%) saturate(904%) hue-rotate(181deg) brightness(93%) contrast(89%);" />
+                    </div>
+                    <div class="py-6 px-4">
+                        <h3 class="text-xl font-semibold mb-2" style="color: #2C6EAB;">Baltic Cold Plunge</h3>
+                        <p class="text-md mb-4" style="color: #2C6EAB;">A Canadian-made cold therapy tub with a 132-gallon capacity, perfect for post-workout recovery.</p>
+                        <a href="#shop" class="refined-button refined-button-bordered inline-block" style="color: #2C6EAB; border-color: #2C6EAB;">Learn More</a>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-custom transition-shadow hover:shadow-hover hover:grow">
+                    <div class="flex justify-center py-6">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3050/3050216.png" alt="Sauna Icon" class="h-24 w-24 product-icon" style="filter: invert(27%) sepia(59%) saturate(904%) hue-rotate(181deg) brightness(93%) contrast(89%);" />
+                    </div>
+                    <div class="py-6 px-4">
+                        <h3 class="text-xl font-semibold mb-2" style="color: #2C6EAB;">Canadian Timber Sauna</h3>
+                        <p class="text-md mb-4" style="color: #2C6EAB;">Crafted with Eastern White Cedar, this sauna offers a luxurious relaxation experience.</p>
+                        <a href="#shop" class="refined-button refined-button-bordered inline-block" style="color: #2C6EAB; border-color: #2C6EAB;">Learn More</a>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-custom transition-shadow hover:shadow-hover hover:grow">
+                    <div class="flex justify-center py-6">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2948/2948585.png" alt="Infrared Therapy Icon" class="h-24 w-24 product-icon" style="filter: invert(27%) sepia(59%) saturate(904%) hue-rotate(181deg) brightness(93%) contrast(89%);" />
+                    </div>
+                    <div class="py-6 px-4">
+                        <h3 class="text-xl font-semibold mb-2" style="color: #2C6EAB;">Infrared Therapy</h3>
+                        <p class="text-md mb-4" style="color: #2C6EAB;">Enhance recovery and wellness with our advanced infrared therapy solutions.</p>
+                        <a href="#shop" class="refined-button refined-button-bordered inline-block" style="color: #2C6EAB; border-color: #2C6EAB;">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="featured-products" class="py-20">
+        <div class="container mx-auto text-center px-4">
+            <h2 class="text-3xl sm:text-4xl font-semibold mb-6" style="color: #2C6EAB;">Featured Products</h2>
+            <p class="text-md sm:text-lg mb-12 max-w-2xl mx-auto" style="color: #2C6EAB;">
+                Explore our top picks for elite wellness and recovery.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+                <div class="bg-white rounded-lg shadow-custom transition-shadow hover:shadow-hover hover:grow">
+                    <div class="flex justify-center py-6">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3048/3048422.png" alt="Cold Plunge Icon" class="h-32 w-32 product-icon" style="filter: invert(27%) sepia(59%) saturate(904%) hue-rotate(181deg) brightness(93%) contrast(89%);" />
+                    </div>
+                    <div class="py-6 px-4">
+                        <h3 class="text-xl font-semibold mb-2" style="color: #2C6EAB;">Baltic Cold Plunge Elite</h3>
+                        <p class="text-md mb-4" style="color: #2C6EAB;">Our premium cold plunge with advanced chilling technology for optimal recovery.</p>
+                        <a href="#shop" class="refined-button refined-button-bordered inline-block" style="color: #2C6EAB; border-color: #2C6EAB;">Shop Now</a>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-custom transition-shadow hover:shadow-hover hover:grow">
+                    <div class="flex justify-center py-6">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3050/3050216.png" alt="Sauna Icon" class="h-32 w-32 product-icon" style="filter: invert(27%) sepia(59%) saturate(904%) hue-rotate(181deg) brightness(93%) contrast(89%);" />
+                    </div>
+                    <div class="py-6 px-4">
+                        <h3 class="text-xl font-semibold mb-2" style="color: #2C6EAB;">Lux Infrared Sauna</h3>
+                        <p class="text-md mb-4" style="color: #2C6EAB;">A state-of-the-art infrared sauna for deep relaxation and detoxification.</p>
+                        <a href="#shop" class="refined-button refined-button-bordered inline-block" style="color: #2C6EAB; border-color: #2C6EAB;">Shop Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="shop-by-category" class="py-20" style="background-color: #E8F0F5;">
+        <div class="container mx-auto text-center px-4">
+            <h2 class="text-3xl sm:text-4xl font-semibold mb-6" style="color: #2C6EAB;">Shop by Category</h2>
+            <p class="text-md sm:text-lg mb-12 max-w-2xl mx-auto" style="color: #2C6EAB;">
+                Find the perfect wellness gear for your needs.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+                <div class="bg-white rounded-lg shadow-custom transition-shadow hover:shadow-hover hover:grow">
+                    <div class="flex justify-center py-6">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3048/3048422.png" alt="Cold Plunge Icon" class="h-24 w-24 product-icon" style="filter: invert(27%) sepia(59%) saturate(904%) hue-rotate(181deg) brightness(93%) contrast(89%);" />
+                    </div>
+                    <div class="py-6 px-4">
+                        <h3 class="text-xl font-semibold mb-2" style="color: #2C6EAB;">Cold Plunges</h3>
+                        <a href="#shop" class="refined-button refined-button-bordered inline-block" style="color: #2C6EAB; border-color: #2C6EAB;">Shop Now</a>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-custom transition-shadow hover:shadow-hover hover:grow">
+                    <div class="flex justify-center py-6">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3050/3050216.png" alt="Sauna Icon" class="h-24 w-24 product-icon" style="filter: invert(27%) sepia(59%) saturate(904%) hue-rotate(181deg) brightness(93%) contrast(89%);" />
+                    </div>
+                    <div class="py-6 px-4">
+                        <h3 class="text-xl font-semibold mb-2" style="color: #2C6EAB;">Saunas</h3>
+                        <a href="#shop" class="refined-button refined-button-bordered inline-block" style="color: #2C6EAB; border-color: #2C6EAB;">Shop Now</a>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-custom transition-shadow hover:shadow-hover hover:grow">
+                    <div class="flex justify-center py-6">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2948/2948585.png" alt="Infrared Therapy Icon" class="h-24 w-24 product-icon" style="filter: invert(27%) sepia(59%) saturate(904%) hue-rotate(181deg) brightness(93%) contrast(89%);" />
+                    </div>
+                    <div class="py-6 px-4">
+                        <h3 class="text-xl font-semibold mb-2" style="color: #2C6EAB;">Infrared Therapy</h3>
+                        <a href="#shop" class="refined-button refined-button-bordered inline-block" style="color: #2C6EAB; border-color: #2C6EAB;">Shop Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="faqs" class="py-20">
+        <div class="container mx-auto text-center px-4">
+            <h2 class="text-3xl sm:text-4xl font-semibold mb-6" style="color: #2C6EAB;">Frequently Asked Questions</h2>
+            <p class="text-md sm:text-lg mb-12 max-w-2xl mx-auto" style="color: #2C6EAB;">
+                Get answers to common questions about our products and services.
+            </p>
+            <div class="max-w-3xl mx-auto text-left">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3 class="text-lg font-semibold" style="color: #2C6EAB;">Do you offer free shipping?</h3>
+                        <svg class="h-6 w-6" fill="none" stroke="#2C6EAB" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p class="text-md" style="color: #2C6EAB;">Yes, we offer free shipping to most states within the U.S. Some remote areas may incur additional freight costs.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3 class="text-lg font-semibold" style="color: #2C6EAB;">Can I get help choosing the right product?</h3>
+                        <svg class="h-6 w-6" fill="none" stroke="#2C6EAB" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p class="text-md" style="color: #2C6EAB;">Absolutely. Our team is available to assist with any questions to ensure you find the right fit for your wellness space.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3 class="text-lg font-semibold" style="color: #2C6EAB;">Do you offer price matching?</h3>
+                        <svg class="h-6 w-6" fill="none" stroke="#2C6EAB" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p class="text-md" style="color: #2C6EAB;">Yes, we honor competitive pricing. If you find a better price from an authorized retailer, we’ll match it.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="newsletter" class="py-20" style="background-color: #2C6EAB;">
+        <div class="container mx-auto text-center px-4">
+            <h2 class="text-3xl sm:text-4xl font-semibold mb-6 text-white">Subscribe to Our Newsletter</h2>
+            <p class="text-md sm:text-lg mb-12 max-w-2xl mx-auto text-white">
+                Stay updated on the latest wellness gear, exclusive offers, and recovery tips.
+            </p>
+            <form class="max-w-md mx-auto flex flex-col sm:flex-row gap-4">
+                <input type="email" placeholder="Your Email" class="w-full px-4 py-2 border border-gray-300 focus:ring focus:ring-gray-200 focus:border-gray-300 transition-colors" style="border-radius: 4px;" />
+                <button type="submit" class="refined-button text-white" style="background-color: #E8F0F5; color: #2C6EAB;">Subscribe</button>
+            </form>
+        </div>
+    </section>
+
+    <footer class="py-6" style="background-color: #2C6EAB;">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center md:items-start">
+            <div class="text-center md:text-left mb-4 md:mb-0">
+                <h4 class="font-semibold text-lg mb-2 text-white">Stay Connected</h4>
+                <p class="mb-2 text-white">For inquiries, email us at <a href="mailto:info@elitewellnessdirect.com" class="hover:underline text-white">info@elitewellnessdirect.com</a></p>
+                <div class="flex justify-center md:justify-start space-x-4 mt-4">
+                    <a href="#" class="hover:text-white transition-colors hover:grow">
+                        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968764.png" alt="Facebook" class="h-6 w-6" style="filter: invert(100%);" />
+                    </a>
+                    <a href="#" class="hover:text-white transition-colors hover:grow">
+                        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968830.png" alt="Twitter" class="h-6 w-6" style="filter: invert(100%);" />
+                    </a>
+                </div>
+            </div>
+            <div class="text-center md:text-right">
+                <div class="flex flex-col space-y-2">
+                    <div class="flex justify-center md:justify-end space-x-4">
+                        <a href="#hero" class="text-white hover:underline transition-colors">Home</a>
+                        <a href="#our-products" class="text-white hover:underline transition-colors">Products</a>
+                        <a href="#about-us" class="text-white hover:underline transition-colors">About</a>
+                    </div>
+                    <div class="flex justify-center md:justify-end space-x-4">
+                        <a href="#privacy-policy" class="text-white hover:underline transition-colors text-sm">Privacy Policy</a>
+                        <a href="#terms" class="text-white hover:underline transition-colors text-sm">Terms of Use</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p class="mt-4 text-white text-sm text-center">© 2025 Elite Wellness Direct. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Fade-in animation on scroll
+        const sections = document.querySelectorAll('section');
+        function revealSections() {
+            sections.forEach(section => {
+                const top = section.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+                if (top < windowHeight * 0.8) {
+                    section.classList.add('fade-in');
+                }
+            });
+        }
+        window.addEventListener('scroll', revealSections);
+
+        // Hamburger menu toggle
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // FAQ toggle functionality
+        const faqQuestions = document.querySelectorAll('.faq-question');
+        faqQuestions.forEach(question => {
+            question.addEventListener('click', () => {
+                const answer = question.nextElementSibling;
+                answer.classList.toggle('active');
+            });
+        });
+    </script>
+</body>
+</html>
